@@ -13,14 +13,16 @@ use Illuminate\Http\Request;
 |
 */
 
-Route::middleware('auth:api')->get('/user', function (Request $request) {
-    return $request->user();
-});
+//Route::middleware('auth:api')->get('/user', function (Request $request) {
+//    return $request->user();
+//});
 
 /*
  * Users
  */
 Route::resource('users','User\UserController',['except'=>['create','edit']]);
+Route::get('user/verify/{token}','User\UserController@verify')->name('verify');
+Route::get('users/{user}/resend','User\UserController@resend')->name('resend');
 
 /*
  * Buyers

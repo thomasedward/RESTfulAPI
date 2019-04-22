@@ -6,6 +6,7 @@ use App\Product;
 use App\Seller;
 use Illuminate\Http\Request;
 use App\Http\Controllers\ApiController;
+use Illuminate\Support\Facades\Storage;
 
 class SellerProductController extends ApiController
 {
@@ -39,7 +40,19 @@ class SellerProductController extends ApiController
         $this->validate($request,$rules);
         $data = $request->all();
         $data['status'] = Product::UNAVAILABLE_PRODUCT;
-        $data['image'] = '1.jpg';
+        //for image
+
+        $file = $request->file('image');
+
+        /* $fileName = $file->getClientOriginalName(); */
+        $sha1 = sha1($file->getClientOriginalName());
+        $extension = $file->getClientOriginalExtension();
+        $fileName = "Product-image-" . date('Y-m-d-h-i-s')."-".$sha1.".".$extension;
+        $path = base_path() . '/public/img';
+        $file->move($path , $fileName);
+
+        $data['image'] = $fileName;
+        //$data['image'] = $request->image->store('','images');
         $data['seller_id'] = $seller->id;
         $product  = Product::create($data);
         return $this->showOne($product);
@@ -75,6 +88,27 @@ class SellerProductController extends ApiController
                 return $this->errorResponse('An active product must have at least one category',409);
             }
         }
+
+        if ($request->hasFile('image'))
+        {
+
+            $productImage = $product->image;
+            Storage::disk('images')->delete($productImage);
+
+            //for image
+
+            $file = $request->file('image');
+
+            /* $fileName = $file->getClientOriginalName(); */
+            $sha1 = sha1($file->getClientOriginalName());
+            $extension = $file->getClientOriginalExtension();
+            $fileName = "Product-image-" . date('Y-m-d-h-i-s')."-".$sha1.".".$extension;
+            $path = base_path() . '/public/img';
+            $file->move($path , $fileName);
+
+            $product->image = $fileName;
+        }
+
         if ($product->isClean())
         {
             return $this->errorResponse('you neet to specify a different  value to update ',422);
@@ -93,7 +127,10 @@ class SellerProductController extends ApiController
     public function destroy(Seller $seller,Product $product)
     {
         $this->checkSeller($seller,$product);
+        $productImage = $product->image;
         $product->delete();
+        Storage::disk('images')->delete($productImage);
+
         return $this->showOne($product);
     }
 
