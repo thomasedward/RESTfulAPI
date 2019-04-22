@@ -3,10 +3,14 @@
 namespace App;
 use App\Product;
 use App\Scopes\SellerScope;
+use App\Transformers\SellerTransformer;
 
 class Seller extends User
 {
+
     protected $table = 'users';
+
+    public $transformer = SellerTransformer::class;
 
 
 
