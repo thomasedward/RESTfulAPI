@@ -29,7 +29,7 @@ class UserController extends ApiController
     public function store(Request $request)
     {
         $rules =[
-            'name' => 'required|string|max:255',
+            'name' => 'required|regex:/^[A-Za-z\s-_]+$/|string|max:255',
             'email' => 'required|string|email|max:255|unique:users',
             'password' => 'required|string|min:6|confirmed',
 
@@ -55,9 +55,9 @@ class UserController extends ApiController
      * @param  int  $id
      * @return \Illuminate\Http\Response
      */
-    public function show($id)
+    public function show(User $user)
     {
-        $user = User::findOrfail($id);
+
         return $this->showOne($user);
     }
 
@@ -70,11 +70,10 @@ class UserController extends ApiController
      * @param  int  $id
      * @return \Illuminate\Http\Response
      */
-    public function update(Request $request, $id)
+    public function update(Request $request, User $user)
     {
-        $user = User::findOrfail($id);
         $rules = [
-            'email' => 'string|email|max:255|unique:users,email,'. $user->id,
+            'email' => 'string|regex:/^[A-Za-z\s-_]+$/|email|max:255|unique:users,email,'. $user->id,
             'password' => 'string|min:6|confirmed',
             'admin' => 'in:' . User::ADMIN_USER . ',' . User::REGULAR_USER,
         ];
@@ -114,9 +113,8 @@ class UserController extends ApiController
      * @param  int  $id
      * @return \Illuminate\Http\Response
      */
-    public function destroy($id)
+    public function destroy(User $user)
     {
-        $user = User::findOrfail($id);
 
         $user->delete();
 
