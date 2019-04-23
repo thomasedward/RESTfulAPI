@@ -60,5 +60,6 @@ class Kernel extends HttpKernel
         'guest' => \App\Http\Middleware\RedirectIfAuthenticated::class,
         'throttle' => \App\Http\Middleware\CustomThrottleRequests::class,
         'signatrue' =>\App\Http\Middleware\signatrueMiddleware::class,
+        'transformer.input' =>\App\Http\Middleware\TransformerInput::class,
     ];
 }

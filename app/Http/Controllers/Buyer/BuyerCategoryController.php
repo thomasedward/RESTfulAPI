@@ -15,13 +15,21 @@ class BuyerCategoryController extends ApiController
      */
     public function index(Buyer $buyer)
     {
-        $categores = $buyer->transactions()
-                           ->with('product.categories')
-                           ->get()
-                           ->pluck('product.categories')
-                           ->unique('id')
-                           ->values();
-        return $this->showAll($categores);
+        $sellers = $buyer->transactions()->with('product.categories')
+            ->get()
+            ->pluck('product.categories')
+            ->collapse()
+            ->unique('id')
+            ->values();
+
+        return $this->showAll($sellers);
+//        $categores = $buyer->transactions()
+//                           ->with('product.categories')
+//                           ->get()
+//                           ->pluck('categories')
+//                           ->unique('id')
+//                           ->values();
+//        return $this->showAll($categores);
     }
 
 

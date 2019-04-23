@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\User;
 
 use App\Mail\UserCreated;
+use App\Transformers\UserTransformer;
 use App\User;
 use Illuminate\Http\Request;
 use App\Http\Controllers\ApiController;
@@ -10,6 +11,13 @@ use Illuminate\Support\Facades\Mail;
 
 class UserController extends ApiController
 {
+    public function __construct()
+    {
+        parent::__construct();
+        $this->middleware('transformer.input:' . UserTransformer::class)->only(['store', 'update']);
+
+    }
+
     /**
      * Display a listing of the resource.
      *
@@ -30,12 +38,14 @@ class UserController extends ApiController
      */
     public function store(Request $request)
     {
+
         $rules =[
             'name' => 'required|regex:/^[A-Za-z\s-_]+$/|string|max:255',
             'email' => 'required|string|email|max:255|unique:users',
             'password' => 'required|string|min:6|confirmed',
 
         ];
+        //return $rules;
        $this->validate($request,$rules);
 
 

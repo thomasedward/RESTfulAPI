@@ -4,12 +4,19 @@ namespace App\Http\Controllers\Seller;
 
 use App\Product;
 use App\Seller;
+use App\Transformers\ProductTransformer;
+use App\Transformers\SellerTransformer;
 use Illuminate\Http\Request;
 use App\Http\Controllers\ApiController;
 use Illuminate\Support\Facades\Storage;
 
 class SellerProductController extends ApiController
 {
+    public  function __construct()
+    {
+        parent::__construct();
+        $this->middleware('transformer.input:' . ProductTransformer::class)->only(['store','update']);
+    }
     /**
      * Display a listing of the resource.
      *
