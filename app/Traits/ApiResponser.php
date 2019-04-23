@@ -1,7 +1,9 @@
 <?php
 namespace App\Traits;
 
+use Illuminate\Support\Facades\Validator;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Pagination\LengthAwarePaginator;
 use Illuminate\Support\Collection;
 
 trait  ApiResponser
@@ -23,9 +25,10 @@ trait  ApiResponser
             return $this->successResponse(['data'=> $collection],$code);
         }
         $transformer = $collection->first()->transformer;
-        $collection = $this->sortDate($collection,$transformer);
-        $collection = $this->filterDate($collection,$transformer);
-        $collection = $this->transformerDate($collection,$transformer);
+        $collection  = $this->sortDate($collection,$transformer);
+        $collection  = $this->filterDate($collection,$transformer);
+        $collection  = $this->paginate($collection);
+        $collection  = $this->transformerDate($collection,$transformer);
 
         return $this->successResponse(['data'=> $collection],$code);
     }
@@ -57,6 +60,26 @@ trait  ApiResponser
         }
 
         return $collection;
+    }
+    protected function paginate(Collection $collection)
+    {
+        $rules= [
+          'pre_page' => 'integer|min:2|max:50',
+        ];
+        Validator::validate(request()->all() , $rules);
+        $page = LengthAwarePaginator::resolveCurrentPage();
+        $prePage = 15;
+        if (request()->has('pre_page'))
+        {
+            $prePage = (int) request()->pre_page;
+        }
+        $results = $collection->slice(($page - 1 ) * $prePage , $prePage)->values();
+        $paginated = new LengthAwarePaginator($results , $collection->count(),$prePage , $page ,[
+           'path' => LengthAwarePaginator::resolveCurrentPage(),
+        ]);
+        $paginated->appends(request()->all());
+        return $paginated;
+
     }
     protected function showMessage($message  , $code = 200)
     {
