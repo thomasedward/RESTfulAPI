@@ -1,8 +1,9 @@
 <?php
 namespace App\Traits;
 
-use App\SerchUrl;
+use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Cache;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Validator;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Pagination\LengthAwarePaginator;
@@ -100,8 +101,31 @@ trait  ApiResponser
         ksort($queryParams);
         $queryString = http_build_query($queryParams);
         $fullUrl = "{$url}?{$queryString}";
+        //return $data;
 
-        return Cache::remember($fullUrl , 3 , function () use ($data) {
+        //$i = 1;
+        $text = '';
+        foreach ($data as $d)
+        {
+            foreach ($d as $da)
+            {
+                $text = $da;
+
+                //return $text;
+            }
+
+
+
+        }
+        DB::table('search_urls')
+            ->insert(['url' => $url,
+                      'FullUrl' => $fullUrl,
+                      'data' => (int)$data,
+                      'created_at' =>\Carbon\Carbon::now()->toDateTimeString(),
+                      'updated_at' => \Carbon\Carbon::now()->toDateTimeString() ]);
+
+
+        return Cache::remember($fullUrl , 30/60 , function () use ($data) {
 
            return $data;
         });
