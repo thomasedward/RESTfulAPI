@@ -101,26 +101,11 @@ trait  ApiResponser
         ksort($queryParams);
         $queryString = http_build_query($queryParams);
         $fullUrl = "{$url}?{$queryString}";
-        //return $data;
-
-        //$i = 1;
-        $text = '';
-        foreach ($data as $d)
-        {
-            foreach ($d as $da)
-            {
-                $text = $da;
-
-                //return $text;
-            }
-
-
-
-        }
+        //return (string)json_encode($data);
         DB::table('search_urls')
             ->insert(['url' => $url,
                       'FullUrl' => $fullUrl,
-                      'data' => (int)$data,
+                      'data' => json_encode($data) ,
                       'created_at' =>\Carbon\Carbon::now()->toDateTimeString(),
                       'updated_at' => \Carbon\Carbon::now()->toDateTimeString() ]);
 

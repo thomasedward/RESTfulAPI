@@ -6,17 +6,18 @@ use App\Transformers\UserTransformer;
 use Illuminate\Database\Eloquent\SoftDeletes;
 use Illuminate\Notifications\Notifiable;
 use Illuminate\Foundation\Auth\User as Authenticatable;
+use Laravel\Passport\HasApiTokens;
 
 class User extends Authenticatable
 {
     public $transformer = UserTransformer::class;
-    use SoftDeletes;
+
+    use Notifiable,HasApiTokens,SoftDeletes;
     protected $dates = ['deleted_at'];
     const VERIFIED_USER = '1';
     const UNVERIFIED_USER = '0';
     const ADMIN_USER = 'true';
     const REGULAR_USER = 'false';
-    use Notifiable;
 
     /**
      * The attributes that are mass assignable.
